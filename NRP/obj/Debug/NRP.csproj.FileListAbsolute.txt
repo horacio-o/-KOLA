@@ -1,0 +1,7 @@
+C:\Users\Tonda\ŠKOLA\-KOLA\NRP\obj\Debug\NRP.csproj.AssemblyReference.cache
+C:\Users\Tonda\ŠKOLA\-KOLA\NRP\obj\Debug\NRP.csproj.CoreCompileInputs.cache
+C:\Users\Tonda\ŠKOLA\-KOLA\NRP\bin\Debug\NRP.exe.config
+C:\Users\Tonda\ŠKOLA\-KOLA\NRP\bin\Debug\NRP.exe
+C:\Users\Tonda\ŠKOLA\-KOLA\NRP\bin\Debug\NRP.pdb
+C:\Users\Tonda\ŠKOLA\-KOLA\NRP\obj\Debug\NRP.exe
+C:\Users\Tonda\ŠKOLA\-KOLA\NRP\obj\Debug\NRP.pdb
