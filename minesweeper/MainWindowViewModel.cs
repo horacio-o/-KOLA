@@ -18,8 +18,12 @@ namespace minesweeper
     }
     internal class MainWindowViewModel
     {
+        int current_num_of_found_mines = 0;
+        int number_of_mines = 0;
+        int real_size = 0;
         public Button2[,] GenerateButtons(Grid grid, int size, int numberOfMines)
         {
+            real_size = size;
             Button2[,] buttons = new Button2[size, size];
             for (int i = 0; i < size; i++)//vytvoří buttons
             {
@@ -51,6 +55,7 @@ namespace minesweeper
                 if(!buttons[x_value, y_value].isMine)
                 {
                     buttons[x_value, y_value].isMine = true;
+                    number_of_mines++;
                     i++;
                     continue;
                 }
@@ -182,10 +187,20 @@ namespace minesweeper
             if( ((Button2)sender).Content == null)
             {
                 ((Button2)sender).Content = "🚩";
+                if(((Button2)sender).isMine)
+                {
+                    current_num_of_found_mines++;
+                    if(current_num_of_found_mines == number_of_mines)
+                    {
+                        //tady by měly rectangle a label změnit visibility na visible, nevim jak
+                    }
+                }
+
             }
             else
             {
                 ((Button2)sender).Content = null;
+                current_num_of_found_mines--;
             }
         }
     }

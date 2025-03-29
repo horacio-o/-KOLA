@@ -24,5 +24,7 @@
                 <Button Content="Hardcore" HorizontalAlignment="Center" VerticalAlignment="Top" Width="98" Height="33" Margin="0,66,0,0" Click="HardcoreClick"/>
             </Grid>
         </Expander>
+        <Rectangle x:Name="WinRect" Grid.ColumnSpan="2" HorizontalAlignment="Left" Height="434" Grid.RowSpan="2" Stroke="Black" VerticalAlignment="Top" Width="800" Fill="#FFAE37E8" Visibility="Hidden"/>
+        <Label x:Name="WinLabel" Content="VÍTĚZSTVÍ" HorizontalAlignment="Left" Height="34" Margin="367,200,0,0" VerticalAlignment="Top" Width="66" Grid.ColumnSpan="2" Grid.RowSpan="2" Visibility="Hidden"/>
     </Grid>
 </Window>
