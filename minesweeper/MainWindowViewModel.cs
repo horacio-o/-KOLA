@@ -12,9 +12,10 @@ namespace minesweeper
 {
     class Button2 : Button
     {
-        public bool isMine = false; 
+        public bool isMine = false;
+        public bool was_visited = false;
         public int value = 0;
-        public List<Button2> mine_neighbours = new List<Button2>();
+        public List<Button2> neighbours = new List<Button2>();
     }
     internal class MainWindowViewModel
     {
@@ -78,6 +79,7 @@ namespace minesweeper
                         if(buttons[i - 1, j].isMine)
                         {
                             target_button.value++;
+                            target_button.neighbours.Add(buttons[i - 1, j]);
                         }
                     }
                     if(i - 1 > -1 & j + 1 < size)
@@ -92,6 +94,7 @@ namespace minesweeper
                         if(buttons[i, j - 1].isMine)
                         {
                             target_button.value++;
+                            target_button.neighbours.Add(buttons[i, j - 1]);
                         }
                     }
                     if(j + 1 < size)
@@ -99,6 +102,7 @@ namespace minesweeper
                         if(buttons[i, j + 1].isMine)
                         {
                             target_button.value++;
+                            target_button.neighbours.Add(buttons[i, j + 1]);
                         }
                     }
                     if(i + 1 < size & j - 1 > -1)
@@ -113,6 +117,7 @@ namespace minesweeper
                         if(buttons[i + 1, j].isMine)
                         {
                             target_button.value++;
+                            target_button.neighbours.Add(buttons[i + 1, j]);
                         }
                     }
                     if (i + 1 < size & j + 1 < size)
@@ -128,20 +133,50 @@ namespace minesweeper
             return buttons;
         }
 
+        private void Breadth_First_Search(Button2 start) //nevim, proč to nefunguje
+        {
+            Queue<Button2> queue = new Queue<Button2>();
+            queue.Enqueue(start);
+            while (queue.Count > 0)
+            {
+                Button2 vertex = queue.Dequeue();
+                if (!vertex.was_visited)
+                {
+                    if(vertex.value == 0)
+                    {
+                        vertex.Background = Brushes.Gray;
+                    }
+                    
+                    vertex.was_visited = true;
+
+                    foreach (Button2 friend in vertex.neighbours)
+                    {
+                        if(!friend.was_visited)
+                        {
+                            queue.Enqueue(friend);
+                        }
+                    }
+                }
+            }
+        }
+
         private void ButtonClicked(object sender, RoutedEventArgs e)
         {
             Button2 target_button = (Button2)sender;
-            if( target_button.Content != null)
+            if(target_button.value == 0)
             {
-                return;
+                Breadth_First_Search(target_button);
             }
-            if( target_button.isMine )
+            if (target_button.isMine)
             {
                 Application.Current.Shutdown();
             }
-            else
+            else if(!target_button.isMine)
             {
-                target_button.Content = ((Button2)sender).value;
+                if(target_button.value != 0)
+                {
+                    target_button.Content = target_button.value;
+                }
                 switch (target_button.value)
                 {
                     case 0:
@@ -180,14 +215,16 @@ namespace minesweeper
                         target_button.Background = Brushes.Red;
                         break;
                 }
+                // dává barvy hodnotám od 0 do 8
             }
         }
         private void RightClick(object sender, RoutedEventArgs e)
         {
-            if( ((Button2)sender).Content == null)
+            Button2 target_button = ((Button2)sender);
+            if( target_button.Content == null)
             {
-                ((Button2)sender).Content = "🚩";
-                if(((Button2)sender).isMine)
+                target_button.Content = "🚩";
+                if(target_button.isMine)
                 {
                     current_num_of_found_mines++;
                     if(current_num_of_found_mines == number_of_mines)
