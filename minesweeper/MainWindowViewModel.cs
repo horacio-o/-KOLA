@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,17 +16,19 @@ namespace minesweeper
         public bool isMine = false;
         public bool was_visited = false;
         public int value = 0;
-        public List<Button2> neighbours = new List<Button2>();
+        public int x_coordinate = 0;
+        public int y_coordinate = 0;
     }
     internal class MainWindowViewModel
     {
         int current_num_of_found_mines = 0;
         int number_of_mines = 0;
         int real_size = 0;
-        public Button2[,] GenerateButtons(Grid grid, int size, int numberOfMines)
+        Button2[,] grid_of_buttons;
+        public void GenerateButtons(Grid grid, int size, int numberOfMines)
         {
             real_size = size;
-            Button2[,] buttons = new Button2[size, size];
+            grid_of_buttons = new Button2[size, size];
             for (int i = 0; i < size; i++)//vytvoří buttons
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition());
@@ -44,7 +47,9 @@ namespace minesweeper
                     grid.Children.Add(button);
 
                     // Přidání tlačítka do pole tlačítek
-                    buttons[i, j] = button;
+                    grid_of_buttons[i, j] = button;
+                    button.x_coordinate = i; 
+                    button.y_coordinate = j;
                 }
             }
             
@@ -53,12 +58,11 @@ namespace minesweeper
             {
                 int x_value = rnd.Next(size);
                 int y_value = rnd.Next(size);
-                if(!buttons[x_value, y_value].isMine)
+                if(!grid_of_buttons[x_value, y_value].isMine)
                 {
-                    buttons[x_value, y_value].isMine = true;
+                    grid_of_buttons[x_value, y_value].isMine = true;
                     number_of_mines++;
                     i++;
-                    continue;
                 }
             }
 
@@ -66,96 +70,133 @@ namespace minesweeper
             {
                 for (int j = 0; j < size; j++)
                 {
-                    Button2 target_button = buttons[i, j];
                     if(i - 1 > -1 & j - 1 > -1)
                     {
-                        if (buttons[i - 1, j - 1].isMine)
+                        if (grid_of_buttons[i - 1, j - 1].isMine)
                         {
-                            target_button.value++;
+                            grid_of_buttons[i, j].value++;
                         }
                     }
                     if(i - 1 > -1)
                     {
-                        if(buttons[i - 1, j].isMine)
+                        if(grid_of_buttons[i - 1, j].isMine)
                         {
-                            target_button.value++;
-                            target_button.neighbours.Add(buttons[i - 1, j]);
+                            grid_of_buttons[i, j].value++;
                         }
                     }
                     if(i - 1 > -1 & j + 1 < size)
                     {
-                        if(buttons[i - 1, j + 1].isMine)
+                        if(grid_of_buttons[i - 1, j + 1].isMine)
                         {
-                            target_button.value++;
+                            grid_of_buttons[i, j].value++;
                         }
                     }
                     if(j - 1 > -1)
                     {
-                        if(buttons[i, j - 1].isMine)
+                        if(grid_of_buttons[i, j - 1].isMine)
                         {
-                            target_button.value++;
-                            target_button.neighbours.Add(buttons[i, j - 1]);
+                            grid_of_buttons[i, j].value++;
                         }
                     }
                     if(j + 1 < size)
                     {
-                        if(buttons[i, j + 1].isMine)
+                        if(grid_of_buttons[i, j + 1].isMine)
                         {
-                            target_button.value++;
-                            target_button.neighbours.Add(buttons[i, j + 1]);
+                            grid_of_buttons[i, j].value++;
                         }
                     }
                     if(i + 1 < size & j - 1 > -1)
                     {
-                        if(buttons[i + 1, j - 1].isMine)
+                        if(grid_of_buttons[i + 1, j - 1].isMine)
                         {
-                            target_button.value++;
+                            grid_of_buttons[i, j].value++;
                         }
                     }
                     if(i + 1 <  size)
                     {
-                        if(buttons[i + 1, j].isMine)
+                        if(grid_of_buttons[i + 1, j].isMine)
                         {
-                            target_button.value++;
-                            target_button.neighbours.Add(buttons[i + 1, j]);
+                            grid_of_buttons[i, j].value++;
                         }
                     }
                     if (i + 1 < size & j + 1 < size)
                     {
-                        if (buttons[i + 1, j + 1].isMine)
+                        if (grid_of_buttons[i + 1, j + 1].isMine)
                         {
-                            target_button.value++;
+                            grid_of_buttons[i, j].value++;
                         }
                     }
                 }
             }
-
-            return buttons;
         }
-
-        private void Breadth_First_Search(Button2 start) //nevim, proč to nefunguje
+        private void BFS(Button2 button, Button2[,] buttons)
         {
-            Queue<Button2> queue = new Queue<Button2>();
-            queue.Enqueue(start);
-            while (queue.Count > 0)
+            if (!button.was_visited)
             {
-                Button2 vertex = queue.Dequeue();
-                if (!vertex.was_visited)
-                {
-                    if(vertex.value == 0)
-                    {
-                        vertex.Background = Brushes.Gray;
-                    }
-                    
-                    vertex.was_visited = true;
+                button.was_visited = true;
 
-                    foreach (Button2 friend in vertex.neighbours)
-                    {
-                        if(!friend.was_visited)
-                        {
-                            queue.Enqueue(friend);
-                        }
-                    }
+                switch (button.value)
+                {
+                    case 0:
+                        button.Background = Brushes.Gray;
+                        break;
+
+                    case 1:
+                        button.Background = Brushes.SkyBlue;
+                        button.Content = button.value;
+                        break;
+
+                    case 2:
+                        button.Background = Brushes.LightGreen;
+                        button.Content = button.value;
+                        break;
+
+                    case 3:
+                        button.Background = Brushes.OrangeRed;
+                        button.Content = button.value;
+                        break;
+
+                    case 4:
+                        button.Background = Brushes.Violet;
+                        button.Content = button.value;
+                        break;
+
+                    case 5:
+                        button.Background = Brushes.Yellow;
+                        button.Content = button.value;
+                        break;
+
+                    case 6:
+                        button.Background = Brushes.Cyan;
+                        button.Content = button.value;
+                        break;
+
+                    case 7:
+                        button.Background = Brushes.LightGray;
+                        button.Content = button.value;
+                        break;
+
+                    case 8:
+                        button.Background = Brushes.Red;
+                        button.Content = button.value;
+                        break;
+                }
+
+                if(button.x_coordinate - 1 > -1 & button.value == 0) //jestli políčko nad buttonem existuje a button má value 0, nechci vytvářet metodu IsValidCoordinate(), prosím.... nechci
+                {
+                    BFS(buttons[button.x_coordinate - 1, button.y_coordinate], buttons);
+                }
+                if(button.y_coordinate - 1 > -1 & button.value == 0)
+                {
+                    BFS(buttons[button.x_coordinate, button.y_coordinate - 1], buttons);
+                }
+                if(button.x_coordinate + 1 < real_size & button.value == 0)
+                {
+                    BFS(buttons[button.x_coordinate + 1, button.y_coordinate], buttons);
+                }
+                if(button.y_coordinate + 1 < real_size & button.value == 0)
+                {
+                    BFS(buttons[button.x_coordinate, button.y_coordinate + 1], buttons);
                 }
             }
         }
@@ -165,9 +206,9 @@ namespace minesweeper
             Button2 target_button = (Button2)sender;
             if(target_button.value == 0)
             {
-                Breadth_First_Search(target_button);
+                BFS(target_button, grid_of_buttons);
             }
-            if (target_button.isMine)
+            if(target_button.isMine)
             {
                 Application.Current.Shutdown();
             }
@@ -177,7 +218,7 @@ namespace minesweeper
                 {
                     target_button.Content = target_button.value;
                 }
-                switch (target_button.value)
+                switch(target_button.value)
                 {
                     case 0:
                         target_button.Background = Brushes.Gray;
@@ -229,17 +270,21 @@ namespace minesweeper
                     current_num_of_found_mines++;
                     if(current_num_of_found_mines == number_of_mines)
                     {
-                        //tady by měly rectangle a label změnit visibility na visible, nevim jak
+                        Grid.SetColumn(target_button, (real_size + 2) / 2);
+                        Grid.SetRow(target_button, (real_size + 2) / 2);
+                        target_button.Content = "Vítězství :3";
+                        target_button.Background = Brushes.HotPink;
                     }
                 }
-
             }
             else
             {
-                ((Button2)sender).Content = null;
-                current_num_of_found_mines--;
+                target_button.Content = null;
+                if(target_button.isMine)
+                {
+                    current_num_of_found_mines--;
+                }
             }
         }
     }
 }
-        //TODO:2. získání hodnoty, když na to kliknu 3. když je hodnota 0, udělat BFS
