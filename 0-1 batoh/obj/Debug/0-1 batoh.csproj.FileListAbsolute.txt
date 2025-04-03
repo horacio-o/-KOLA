@@ -1,0 +1,7 @@
+C:\Users\Tonda\ŠKOLA\-KOLA\0-1 batoh\bin\Debug\0-1 batoh.exe.config
+C:\Users\Tonda\ŠKOLA\-KOLA\0-1 batoh\bin\Debug\0-1 batoh.exe
+C:\Users\Tonda\ŠKOLA\-KOLA\0-1 batoh\bin\Debug\0-1 batoh.pdb
+C:\Users\Tonda\ŠKOLA\-KOLA\0-1 batoh\obj\Debug\0-1 batoh.csproj.AssemblyReference.cache
+C:\Users\Tonda\ŠKOLA\-KOLA\0-1 batoh\obj\Debug\0-1 batoh.csproj.CoreCompileInputs.cache
+C:\Users\Tonda\ŠKOLA\-KOLA\0-1 batoh\obj\Debug\0-1 batoh.exe
+C:\Users\Tonda\ŠKOLA\-KOLA\0-1 batoh\obj\Debug\0-1 batoh.pdb
