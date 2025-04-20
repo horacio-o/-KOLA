@@ -8,41 +8,49 @@ namespace _0_1_batoh
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            int[] weights = Console.ReadLine().Split(' ').Select(int.Parse).ToArray();
-            int[] values = Console.ReadLine().Split(' ').Select(int.Parse).ToArray();
-            int max_weight = int.Parse(Console.ReadLine());
+            int[] weights = Console.ReadLine().Split().Select(int.Parse).ToArray();
+            int[] values = Console.ReadLine().Split().Select(int.Parse).ToArray();
+            int capacity = int.Parse(Console.ReadLine());
 
-            bool found_something = false;
-            
-            Batoh(weights, values, max_weight, 0, 0, new List<int>(), 0, ref found_something, new List<int>(), 0);
+            bool[] values_used = new bool[values.Length];
+            int[] solution = new int[0];
+            int solution_value = 0;
 
-            Console.Read();
+            Console.WriteLine("");
+
+            Batoh(values, weights, capacity, 0, new List<int>(), ref solution, ref solution_value, values_used);
+
+            Console.WriteLine(solution_value);
+            Console.WriteLine(string.Join(" ", solution.Select(x => x + 1))); //na tento řádek jsem použil externí pomoc, nevěděl jsem, jak udělat x => x + 1 elegantně :(
         }
 
-        static void Batoh(int[] weights, int[] values, int max_weight, int current_weight, int index, List<int> values_so_far, int current_sum, ref bool something_found, List<int> best_sequence_so_far, int best_sum_so_far)
+        static void Batoh(int[] values, int[] weights, int remaining_capacity, int current_value, List<int> used_values, ref int[] solution, ref int solution_value, bool[] values_used)
         {
-            if(current_weight > max_weight)
+            if (remaining_capacity < 0)
             {
                 return;
             }
-            if(current_sum > best_sum_so_far)
+
+            if (remaining_capacity >= 0 && current_value > solution_value)
             {
-                something_found = true;
-                best_sequence_so_far = values_so_far;
-                best_sum_so_far = current_sum;
-                //return;
+                solution = used_values.ToArray();
+                solution_value = current_value;
             }
-            for (int i = index; i < weights.Length; i++)
+
+            for (int i = 0; i < values.Length; i++)
             {
-                values_so_far.Add(i + 1);
-                current_sum = current_sum + values[i];
-                current_weight = current_weight + weights[i];
-                Batoh(weights, values, max_weight, current_weight, i /* to je index*/, values_so_far, current_sum, ref something_found, best_sequence_so_far, best_sum_so_far);
-                values_so_far.RemoveAt(values_so_far.Count - 1);
-                current_sum = current_sum - values[i];
-                current_weight = current_weight - weights[i];
+                if (values_used[i])
+                {
+                    continue;
+                }
+
+                values_used[i] = true;
+                used_values.Add(i);
+                Batoh(values, weights, remaining_capacity - weights[i], current_value + values[i], used_values, ref solution, ref solution_value, values_used);
+                values_used[i] = false;
+                used_values.RemoveAt(used_values.Count - 1);
             }
         }
     }
