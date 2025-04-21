@@ -18,9 +18,18 @@ namespace maturita
                 pathSoFar.Add(chessboard.startingPos);
                 List<(int, int)> bestPathSoFar = new List<(int, int)>();
                 int bestPathLength = int.MaxValue;
-                bool pathWasFound = false; 
-                chessboard.Step(chessboard.startingPos, pathSoFar, bestPathSoFar, pathWasFound, bestPathLength, bestPathLength);
-                Console.WriteLine();
+                bool pathWasFound = false;
+                (int, List<(int, int)>) ans = chessboard.Step(chessboard.startingPos, pathSoFar, ref bestPathSoFar, ref pathWasFound, ref bestPathLength, ref bestPathLength);
+
+                if (pathWasFound)
+                {
+                    Console.WriteLine(ans.Item1);
+                    Console.WriteLine(string.Join(" –> ", ans.Item2));
+                }
+                else
+                {
+                    Console.WriteLine("Nelze");
+                }
             }
             catch
             {
@@ -40,6 +49,28 @@ namespace maturita
                 emptySquare = 0,
                 piece = 1
             }
+            struct KnightMove
+            {
+                public KnightMove(int r, int c)
+                {
+                    row = r; 
+                    col = c;
+                }
+                public int row;
+                public int col;
+            }
+            List<KnightMove> moves = new List<KnightMove>()
+            {
+                new KnightMove(2, 1),
+                new KnightMove(1, 2),
+                new KnightMove(-1, 2),
+                new KnightMove(-2, 1),
+                new KnightMove(-2, -1),
+                new KnightMove(-1, -2),
+                new KnightMove(1, -2),
+                new KnightMove(2, -1),
+            };
+
 
             /// <summary>
             /// Získá polohu figurek, začáteční polohu, konečnou polohu.
@@ -47,6 +78,10 @@ namespace maturita
             public void GetLocationOfPieces()
             {
                 int numOfPieces = int.Parse(Console.ReadLine());
+                if(numOfPieces > 64 || numOfPieces < 0)
+                {
+                    throw new Exception("number of pieces exceeds the number of squares avaiable");
+                }
                 for (int i = 0; i < numOfPieces; i++)
                 { 
                     int[] xyAxis = Console.ReadLine().Split(' ').Select(int.Parse).ToArray();
@@ -82,63 +117,40 @@ namespace maturita
             /// <param name="pathWasFound"></param>
             /// <param name="bestPathLength"></param>
             /// <param name="maxSuccessfulValue">Pomyslný branch, který jako první úspěšně našel cestu do endingPos, implikuje, že žádný branch, který je delší, nemá smysl býr prohledán</param>
-            public void Step((int row, int col) currentPos, List<(int row, int col)> pathSoFar, List<(int row, int col)> bestPathSoFar, bool pathWasFound, int bestPathLength, int maxSuccessfulValue) 
+            public (int foundPath, List<(int, int)> path) Step((int row, int col) currentPos,  List<(int row, int col)>  pathSoFar,  ref List<(int row, int col)> bestPathSoFar, ref bool pathWasFound, ref int bestPathLength, ref int maxSuccessfulValue) 
             {
                 if(pathSoFar.Count > maxSuccessfulValue)
                 {
-                    return;
+                    return (bestPathLength - 1, bestPathSoFar);
                 }
                 if(currentPos == endingPos)
                 {
                     if(pathSoFar.Count <= bestPathLength)
                     {
-                        bestPathSoFar = pathSoFar;
+                        bestPathSoFar = new List<(int row, int col)>(pathSoFar);
                         bestPathLength = bestPathSoFar.Count;
-                        if(bestPathLength < maxSuccessfulValue)
-                        {
-                            maxSuccessfulValue = bestPathLength;
-                            Console.WriteLine(bestPathLength);
-                            Console.WriteLine(string.Join(" –> ", bestPathSoFar));
-                        }
+                        maxSuccessfulValue = bestPathLength;
                     }
                     pathWasFound = true;
-                    return;
+                    return (bestPathLength - 1, bestPathSoFar);
                 }
                 
                 int x = currentPos.row;
                 int y = currentPos.col;
-                
-                //stěna if-ů :(
-                if (x + 2 < 8 & y + 1 < 8)
+                board[x, y] = (int)namesOfPieces.piece;
+
+                foreach (KnightMove offset in moves)
                 {
-                    if (board[x + 2, y + 1] == (int)namesOfPieces.emptySquare)
+                    if(offset.row + x < 8 & offset.row + x > -1 &  offset.col + y > -1 & offset.col + y < 8)
                     {
-                        pathSoFar.Add((x + 2, y + 1));
-                        Step((x + 2, y + 1), pathSoFar, bestPathSoFar, pathWasFound, bestPathLength, maxSuccessfulValue);
+                        if (board[x + offset.row, y + offset.col] == (int)namesOfPieces.emptySquare)
+                        {
+                            pathSoFar.Add((x + offset.row, y + offset.col));
+                            Step((x + offset.row, y + offset.col), pathSoFar, ref bestPathSoFar, ref pathWasFound, ref bestPathLength, ref maxSuccessfulValue);
+                        }
                     }
                 }
-                if (x + 1 < 8 & y + 2 < 8)
-                {
-                    if (board[x + 1, y + 2] == (int)namesOfPieces.emptySquare)
-                    {
-                        pathSoFar.Add((x + 1, y + 2));
-                        Step((x + 1, y + 2), pathSoFar, bestPathSoFar, pathWasFound, bestPathLength, maxSuccessfulValue);
-                    }
-                }
-
-
-
-
-
-                //nefunguje to, zkusit inputy:
-                //0
-                //0 0
-                //3 3
-
-
-
-
-                return;
+                return (bestPathLength - 1, bestPathSoFar);
             }
         }
     }
